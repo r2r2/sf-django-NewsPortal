@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load my_filters %}
+
+{% block title %}
+    News
+{% endblock title %}
+
+{% block content %}
+    <h2><strong>{{ detail_news.post_title|censor }}</strong></h2>
+    <p>{{ detail_news.date_creation|date:'d-M-Y' }} {{ detail_news.date_creation|time:'H:i' }}</p>
+    <hr>
+    {{ detail_news.post_text|censor|urlize }}
+{% endblock content %}

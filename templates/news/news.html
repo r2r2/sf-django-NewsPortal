@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %} News {% endblock title %}
+
+{% block content %}
+    <h3>Latest News</h3>
+    <p>{{ news|length }}</p>
+    <hr>
+    {% for new in news %}
+        <h3><strong><a href="{% url 'news_detail' new.id %}">{{ new.post_title }}</a></strong></h3>
+        {{ new.date_creation|date:'d M Y' }}<br>
+        {{ new.post_text|truncatechars:50 }}<br>
+    {% empty %}
+        <li>Sorry, no news found in this category.</li>
+    {% endfor %}
+{% endblock content %}
