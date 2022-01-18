@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %} News Create {% endblock title %}
+
+{% block content %}
+    <h2>Добавить статью</h2>
+    <hr>
+    <div style="margin-left: 30%">
+    <form method="post" class="form-input">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <br>
+        <input type="submit" value="Добавить" class="btn btn-success btn-sm">
+    </form>
+    </div>
+{% endblock content %}

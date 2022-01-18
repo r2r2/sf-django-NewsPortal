@@ -1,0 +1,53 @@
+body, h1, h2, h3, h4, h5, h6, a {
+            font-family(stack): -apple-system, BlinkMacSystemFont, "Segoe UI Light", wf_segoe-ui_light, Arial, "Helvetica Neue", Verdana, Helvetica, sans-serif;
+            line-height: normal;
+            vertical-align: baseline;
+            letter-spacing: normal;
+            word-spacing: 0;
+            font-weight: 400;
+            font-style: normal;
+            font-variant: normal;
+            text-transform: none;
+            text-decoration: none solid rgb(54, 54, 54);
+            text-align: start;
+            text-indent: 0;
+            color: rgb(54, 54, 54);
+            background-color: #ffffff;
+        }
+
+h1, h2 {
+            text-align: center;
+        }
+
+a:hover {
+	color: #CC0000;
+	text-decoration: underline;
+}
+
+.form-input {
+    width: 500px;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Light", wf_segoe-ui_light, Arial, "Helvetica Neue", Verdana, Helvetica, sans-serif;
+
+
+}
+
+.form-label {
+    display: inline-block;
+    min-width: 150px;
+    vertical-align: top;
+}
+
+.form-error ul {
+    list-style: none;
+    padding: 0;
+    color: #CC0000;
+}
+
+.form-button {
+    min-width: 200px;
+    font-size: 16px;
+}
+.pagination {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Light", wf_segoe-ui_light, Arial, "Helvetica Neue", Verdana, Helvetica, sans-serif;
+}

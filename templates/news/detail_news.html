@@ -2,12 +2,17 @@
 {% load my_filters %}
 
 {% block title %}
-    News
+    {{ detail_news.post_title|censor }}
 {% endblock title %}
+{% block css %}{% endblock css %}
 
 {% block content %}
-    <h2><strong>{{ detail_news.post_title|censor }}</strong></h2>
-    <p>{{ detail_news.date_creation|date:'d-M-Y' }} {{ detail_news.date_creation|time:'H:i' }}</p>
+    <h2>{{ detail_news.post_title|censor }}</h2>
+    <div class="small text-muted"><p>{{ detail_news.date_creation|date:'d M Y' }}</p></div>
     <hr>
-    {{ detail_news.post_text|censor|urlize }}
+    <p>{{ detail_news.post_text|linebreaks|censor|safe }}</p>
+
+    <p><a href="{% url 'update' detail_news.id %}"><u>Редактировать</u></a></p>
+    <p><a href="{% url 'delete' detail_news.id %}"><u>Удалить</u></a></p>
+
 {% endblock content %}

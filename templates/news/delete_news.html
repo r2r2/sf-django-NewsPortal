@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %} News Delete {% endblock title %}
+
+{% block content %}
+    <h2>Удалить пост?</h2>
+    <hr>
+    <h3>{{ post.post_title }}</h3>
+    <p>{{ post.post_text|truncatechars:100 }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="submit" value="Подтвердить" class="btn btn-danger">
+    </form>
+
+{% endblock content %}
+

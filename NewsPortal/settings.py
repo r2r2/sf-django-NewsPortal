@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'accounts',
     'django_extensions',
+    'django_filters',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +60,7 @@ ROOT_URLCONF = 'NewsPortal.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [os.path.join(BASE_DIR, 'templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -121,9 +123,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-BAD_WORDS = r"D:\IT\SF_Python_Projects\Django_40_projects\SkillFactory\NewsPortal\BAD_WORDS.txt"
+BAD_WORDS = os.path.join(BASE_DIR, "BAD_WORDS.txt")
+
+CRISPY_FAIL_SILENTLY = not DEBUG

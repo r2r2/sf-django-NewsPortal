@@ -5,6 +5,7 @@ from django import template
 from NewsPortal.settings import BAD_WORDS
 
 register = template.Library()
+punctuation = punctuation + '...'
 
 
 @register.filter(name='censor')
@@ -14,7 +15,7 @@ def censor(value: str):
         value = value.split()
         i = 0
         while i < len(value):
-            if value[i].strip(punctuation).lower() in mat:
+            if value[i].strip(punctuation).lower() in mat and value[i] not in punctuation:
                 value[i] = '✗' * len(value[i])
                 i = 0
             i += 1

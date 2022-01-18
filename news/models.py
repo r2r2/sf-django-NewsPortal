@@ -25,7 +25,7 @@ class Author(models.Model):
 
     def __str__(self):
         return f"{self.author_name}\n" \
-               f"{self.author_rating}"
+               f"(rating:{self.author_rating})"
 
 
 class Category(models.Model):
@@ -33,6 +33,9 @@ class Category(models.Model):
 
     def __str__(self):
         return f"{self.category_name}"
+
+    def get_absolute_url(self):
+        return f'/news/'
 
 
 class Post(models.Model):
@@ -42,15 +45,18 @@ class Post(models.Model):
         (ARTICLE, 'article'),
         (NEWS, 'news'),
     ]
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, verbose_name='Автор')
     article_or_news = models.CharField(max_length=10,
                                        choices=CHOICE,
                                        default=NEWS)
     date_creation = models.DateField(auto_now_add=True)
-    category = models.ManyToManyField(Category, through='PostCategory')
-    post_title = models.CharField(max_length=128, null=True)
-    post_text = models.TextField()
+    category = models.ManyToManyField(Category, through='PostCategory', verbose_name='Категория')
+    post_title = models.CharField(max_length=128, null=True, verbose_name='Заголовок')
+    post_text = models.TextField(verbose_name='Текст статьи')
     post_rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+
+    def get_absolute_url(self):
+        return f'/news/{self.id}'
 
     def like(self):
         self.post_rating += 1
