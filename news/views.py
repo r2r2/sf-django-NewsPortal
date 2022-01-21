@@ -74,8 +74,10 @@ class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 def upgrade_to_author(request):
     user = request.user
     author_group = Group.objects.get(name='authors')
+    common_group = Group.objects.get(name='common')  # Если логинится через Гугл
     if not request.user.groups.filter(name='authors').exists():
         author_group.user_set.add(user)
+        common_group.user_set.add(user)  # Если логинится через Гугл
     return redirect('/news/')
 
 

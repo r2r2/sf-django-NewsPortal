@@ -1,7 +1,7 @@
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
 from django.forms import ModelForm, Textarea, ModelMultipleChoiceField, TextInput, ChoiceField
-
+from django import forms
 from .models import Post, Category
 
 
@@ -31,3 +31,14 @@ class CommonSignupForm(SignupForm):
         common_group = Group.objects.get(name='common')
         common_group.user_set.add(user)
         return user
+
+
+# Если регистрируется через Гугл
+class LocalSignupForm(forms.Form):
+    pass
+
+    def signup(self, request, user):
+        group = "common"
+        g = Group.objects.get(name=group)
+        user.groups.add(g)
+        user.save()
