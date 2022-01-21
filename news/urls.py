@@ -11,4 +11,5 @@ urlpatterns = [
     path('<int:pk>/delete', NewsDelete.as_view(), name='delete'),
     path('search/', NewsSearch.as_view(), name='search'),
     path('add/', NewsCreate.as_view(), name='create'),
+    path('upgrade/', upgrade_to_author, name='upgrade'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

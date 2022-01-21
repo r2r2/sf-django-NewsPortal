@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>{% block title %}NewsPortal{% endblock title %}</title>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link type="text/css" rel="stylesheet" href="{% static 'news/css/styles.css' %}">
+    <!-- Favicon-->
+    <link rel="shortcut icon" type="image/png" href="{% static 'news/assets/favicon.ico' %}"/>
+</head>
+<body>
+
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="/news">News Portal</a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        {% if user.is_authenticated %}
+                            {% if is_not_author %}
+                                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'upgrade' %}">Стать автором</a></li>
+                            {% else %}
+                                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'create' %}">Добавить статью</a></li>
+                            {% endif %}
+                        {% endif %}
+
+                            <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'search' %}">Поиск</a></li>
+
+                        {% if user.is_authenticated %}
+                            <li class="nav-item"><a class="nav-link" aria-current="page" href="/accounts/logout/">Выйти</a></li>
+                            <li class="nav-item"><a class="nav-link" aria-current="page" style="text-decoration: none">| {{ user.username }}</a></li>
+
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link" aria-current="page" href="/accounts/login/">Войти</a></li>
+                        {% endif %}
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+    <div class="container">
+{#        <div class="align-text-top mt-5">#}
+            {% block content %}
+            {% endblock content %}
+{#        </div>#}
+    </div>
+</body>
+</html>
