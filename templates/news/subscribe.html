@@ -8,10 +8,18 @@
     {% csrf_token %}
     <h3><label for="category_name">Выберите интересующие категории:<br></label></h3>
     {% for category in categories %}
-        <h6><input type="checkbox" value="{{ category.category_name }}" name="category_name"> {{ category.category_name }}</h6>
+        {% if category in cat_sub %}
+            <h6><label for="category_name">
+                <input type="checkbox" value="{{ category.category_name }}" name="category_name" checked>
+            </label> {{ category.category_name }}</h6>
+        {% else %}
+            <h6><label for="category_name">
+                <input type="checkbox" value="{{ category.category_name }}" name="category_name">
+            </label> {{ category.category_name }}</h6>
+        {% endif %}
     {% endfor %}
-    <br>
-    <input type="submit" value="Подписаться" class="btn btn-outline-info">
+    <p class="small text-muted">Каждую неделю мы будем присылать Вам подборку статей из выбранных категорий.</p>
+    <input type="submit" value="Сохранить" class="btn btn-outline-info">
 </form>
 {% endblock content %}
 

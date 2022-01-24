@@ -48,8 +48,8 @@ class NewsSearch(LoginRequiredMixin, ListView):
         context = super(NewsSearch, self).get_context_data(**kwargs)
         context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
-        context['category'] = self.request.GET.get('category', 0)
-        context['is_sub'] = Category.objects.filter(subscribers=self.request.user.id)
+        # context['category'] = self.request.GET.get('category', 0)
+        # context['is_sub'] = Category.objects.filter(subscribers=self.request.user.id)
         return context
 
 
@@ -94,17 +94,22 @@ class SubscribeView(View):
 
     def get(self, request, *args, **kwargs):
         categories = Category.objects.all()
-        return render(request, 'news/subscribe.html', context={'categories': categories})
+        cat_sub = Category.objects.filter(subscribers__email=self.request.user.email).distinct()
+        return render(request, 'news/subscribe.html', context={'categories': categories, 'cat_sub': cat_sub})
 
     def post(self, request, *args, **kwargs):
-        category_name = request.POST['category_name']
-        category = Category.objects.get(category_name=category_name)
+        category_name = request.POST.getlist('category_name')
 
-        subscriber = UserCategorySub(
-            user=request.user,
-            category=category,
-        )
-        subscriber.save()
+        UserCategorySub.objects.filter(user=request.user).delete()  # Удаляем все записи по этому пользователю из БД
+
+        # Записываем подписки пользователя в БД
+        for cat in category_name:
+            category = Category.objects.get(category_name=cat)
+            subscriber = UserCategorySub(
+                user=request.user,
+                category=category,
+            )
+            subscriber.save()
 
         # send_mail(
         #     subject=f"Спасибо за подписку на NewsPortal",

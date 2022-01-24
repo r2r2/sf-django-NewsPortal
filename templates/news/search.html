@@ -4,18 +4,16 @@
 {% block title %} News Search {% endblock title %}
 
 {% block content %}
-    <h2>Поиск статьи</h2><br>
+    <h2>Последние новости</h2>
 
     <form method="get">
-        {{ filter.form }}
-        <input type="submit" value="Поиск" class="btn btn-secondary btn-sm">
+        <div>{{ filter.form }}
+        <input type="submit" value="Поиск" class="btn btn-outline-secondary btn-sm"></div>
     </form>
 
-    {% if category %}
-{#        {% if is_sub %}#}
+{#    {% if category %}#}
             <a href="{% url 'news:subscribe' %}">Подписаться на рассылку &raquo;</a>
-{#        {% endif %}#}
-    {% endif %}
+{#    {% endif %}#}
     <hr>
 
 
