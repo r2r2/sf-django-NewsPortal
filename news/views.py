@@ -1,12 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
-from django.shortcuts import redirect
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from NewsPortal.settings import DEFAULT_FROM_EMAIL
 from news.filters import PostFilter
 from news.forms import PostForm
-from news.models import Post
+from news.models import Post, UserCategorySub, Category
 
 
 class NewsList(ListView):
@@ -44,6 +48,8 @@ class NewsSearch(LoginRequiredMixin, ListView):
         context = super(NewsSearch, self).get_context_data(**kwargs)
         context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        context['category'] = self.request.GET.get('category', 0)
+        context['is_sub'] = Category.objects.filter(subscribers=self.request.user.id)
         return context
 
 
@@ -72,13 +78,42 @@ class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
 @login_required
 def upgrade_to_author(request):
+    """Добавление в группу Authors"""
+
     user = request.user
     author_group = Group.objects.get(name='authors')
     common_group = Group.objects.get(name='common')  # Если логинится через Гугл
     if not request.user.groups.filter(name='authors').exists():
         author_group.user_set.add(user)
         common_group.user_set.add(user)  # Если логинится через Гугл
-    return redirect('/news/')
+    return redirect('news:news')
+
+
+class SubscribeView(View):
+    """Подписка на рассылку по категориям"""
+
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.all()
+        return render(request, 'news/subscribe.html', context={'categories': categories})
+
+    def post(self, request, *args, **kwargs):
+        category_name = request.POST['category_name']
+        category = Category.objects.get(category_name=category_name)
+
+        subscriber = UserCategorySub(
+            user=request.user,
+            category=category,
+        )
+        subscriber.save()
+
+        # send_mail(
+        #     subject=f"Спасибо за подписку на NewsPortal",
+        #     message=f"Уважаемый {self.request.user.username}, Вы подписались на категории {subscriber.category}",
+        #     from_email=DEFAULT_FROM_EMAIL,
+        #     recipient_list=[request.user.email]
+        # )
+        return redirect('news:news')
+
 
 
 

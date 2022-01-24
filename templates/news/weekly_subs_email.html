@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h3>Здравствуй, <strong>{{ user.username }}</strong>. </h3>
+    <h2>Свежие статьи за прошедшую неделю:</h2>
+    <div class="container-sm">
+        <ul style="list-style-type: none">
+            {% for post in posts %}
+                <li>{{ post.post_title }}<br>
+                    {{ post.post_text|truncatechars:50 }}
+                    <a href="http://127.0.0.1:8000{{ post.get_absolute_url }}">читать на сайте</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

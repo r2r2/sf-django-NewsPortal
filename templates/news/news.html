@@ -11,7 +11,7 @@
     <hr>
 
         {% for new in news %}
-            <h5><a href="{% url 'news_detail' new.id %}"><strong>{{ new.post_title|censor }}</strong></a></h5>
+            <h5><a href="{% url 'news:news_detail' new.id %}"><strong>{{ new.post_title|censor }}</strong></a></h5>
             <div class="small text-muted"><p>{{ new.date_creation|date:'d M Y' }}</div>
             {{ new.post_text|truncatechars:250|censor }}<br><br></p>
         {% empty %}

@@ -6,6 +6,7 @@ from .models import Post, Category
 
 
 class PostForm(ModelForm):
+    """Форма добавления статьи на сайт"""
 
     category = ModelMultipleChoiceField(queryset=Category.objects.all(), label='Категория', to_field_name='category_name')
 
@@ -25,7 +26,7 @@ class PostForm(ModelForm):
 
 
 class CommonSignupForm(SignupForm):
-
+    """Автоматическое добавление зарегистрированного пользователя в общую группу"""
     def save(self, request):
         user = super(CommonSignupForm, self).save(request)
         common_group = Group.objects.get(name='common')
@@ -33,12 +34,44 @@ class CommonSignupForm(SignupForm):
         return user
 
 
-# Если регистрируется через Гугл
-class LocalSignupForm(forms.Form):
-    pass
+# Если регистрируется через Гугл # TODO make self adding to "common" group through Google
+# class LocalSignupForm(forms.Form):
+#     pass
+#
+#     def signup(self, request, user):
+#         group = Group.objects.get(name="common")
+#         user.groups.add(group)
+#         user.save()
 
-    def signup(self, request, user):
-        group = "common"
-        g = Group.objects.get(name=group)
-        user.groups.add(g)
-        user.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -30,6 +30,7 @@ class Author(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=255, unique=True)
+    subscribers = models.ManyToManyField(User, through='UserCategorySub')
 
     def __str__(self):
         return f"{self.category_name}"
@@ -37,6 +38,13 @@ class Category(models.Model):
     def get_absolute_url(self):
         return f'/news/'
 
+
+class UserCategorySub(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} = {self.category}"
 
 class Post(models.Model):
     ARTICLE = 'AR'

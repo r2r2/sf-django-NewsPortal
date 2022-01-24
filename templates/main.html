@@ -23,13 +23,13 @@
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         {% if user.is_authenticated %}
                             {% if is_not_author %}
-                                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'upgrade' %}">Стать автором</a></li>
+                                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:upgrade' %}">Стать автором</a></li>
                             {% else %}
-                                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'create' %}">Добавить статью</a></li>
+                                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:create' %}">Добавить статью</a></li>
                             {% endif %}
                         {% endif %}
 
-                            <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'search' %}">Поиск</a></li>
+                            <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:search' %}">Поиск</a></li>
 
                         {% if user.is_authenticated %}
                             <li class="nav-item"><a class="nav-link" aria-current="page" href="/accounts/logout/">Выйти</a></li>
