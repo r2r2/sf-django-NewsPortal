@@ -8,13 +8,13 @@ from NewsPortal.settings import DEFAULT_FROM_EMAIL
 from news.models import Post, Category
 
 
-@receiver(m2m_changed, sender=Post.category.through)
-def notify_subscribers(sender, instance, **kwargs):
-    """Информируем пользователей о новой статье в их подписках"""
-    post_info = instance.category.all()
-    for category in post_info:
-        if category.subscribers:
-            sendNewPost(category.pk, instance.pk)
+# @receiver(m2m_changed, sender=Post.category.through)
+# def notify_subscribers(sender, instance, **kwargs):
+#     """Информируем пользователей о новой статье в их подписках"""
+#     post_info = instance.category.all()
+#     for category in post_info:
+#         if category.subscribers:
+#             sendNewPost(category.pk, instance.pk)
 
 
 def sendNewPost(category_id, instance_id):

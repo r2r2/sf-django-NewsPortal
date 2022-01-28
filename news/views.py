@@ -6,11 +6,11 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-
+from .tasks import *
 from NewsPortal.settings import DEFAULT_FROM_EMAIL
-from news.filters import PostFilter
-from news.forms import PostForm
-from news.models import Post, UserCategorySub, Category
+from .filters import PostFilter
+from .forms import PostForm
+from .models import Post, UserCategorySub, Category
 
 
 class NewsList(ListView):
@@ -58,6 +58,13 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = PostForm
     permission_required = ('news.add_post',)
 
+    def form_valid(self, form):
+        post = form.save()
+        post.save()
+        # notify_subscribers.apply_async([post.pk], countdown=5)  # После создания отправляем подписчикам письмо через Celery
+        notify_subscribers.delay(post.pk)  # После создания отправляем подписчикам письмо через Celery
+        return redirect(f'/news/{post.pk}')
+
 
 class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     template_name = 'news/create_news.html'
@@ -76,31 +83,17 @@ class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     permission_required = ('news.delete_post',)
 
 
-@login_required
-def upgrade_to_author(request):
-    """Добавление в группу Authors"""
-
-    user = request.user
-    author_group = Group.objects.get(name='authors')
-    common_group = Group.objects.get(name='common')  # Если логинится через Гугл
-    if not request.user.groups.filter(name='authors').exists():
-        author_group.user_set.add(user)
-        common_group.user_set.add(user)  # Если логинится через Гугл
-    return redirect('news:news')
-
-
 class SubscribeView(View):
     """Подписка на рассылку по категориям"""
 
     def get(self, request, *args, **kwargs):
         categories = Category.objects.all()
-        cat_sub = Category.objects.filter(subscribers__email=self.request.user.email).distinct()
+        cat_sub = Category.objects.filter(subscribers__email=self.request.user.email).distinct()  # Берем все текущие подписки пользователя
         return render(request, 'news/subscribe.html', context={'categories': categories, 'cat_sub': cat_sub})
 
     def post(self, request, *args, **kwargs):
         category_name = request.POST.getlist('category_name')
-
-        UserCategorySub.objects.filter(user=request.user).delete()  # Удаляем все записи по этому пользователю из БД
+        UserCategorySub.objects.filter(user=request.user).delete()  # Удаляем все подписки этого пользователя из БД
 
         # Записываем подписки пользователя в БД
         for cat in category_name:
@@ -118,6 +111,21 @@ class SubscribeView(View):
         #     recipient_list=[request.user.email]
         # )
         return redirect('news:news')
+
+
+@login_required
+def upgrade_to_author(request):
+    """Добавление в группу Authors"""
+
+    user = request.user
+    author_group = Group.objects.get(name='authors')
+    common_group = Group.objects.get(name='common')  # Если логинится через Гугл
+    if not request.user.groups.filter(name='authors').exists():
+        author_group.user_set.add(user)
+        common_group.user_set.add(user)  # Если логинится через Гугл
+    return redirect('news:news')
+
+
 
 
 

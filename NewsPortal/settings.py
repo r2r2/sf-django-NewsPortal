@@ -169,10 +169,24 @@ EMAIL_PORT = 465
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = True
+EMAIL_TIMEOUT = 5
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
 
-if DEBUG:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# REDIS_CREDENTIALS in format- redis://:password@hostname:port/db_number
+# db_number = 0 (индекс БД)
+# CELERY_BROKER_URL = os.getenv('REDIS_CREDENTIALS', 'redis://redis:6379/0')
+# CELERY_BROKER_URL = os.environ.get('REDIS_CREDENTIALS', 'redis://redis:6379/0')
+CELERY_BROKER_URL = 'redis://:ysWL7SiwYi6ESJHfia0y2ePyu89lBiEx@redis-12793.c293.eu-central-1-1.ec2.cloud.redislabs.com:12793/0'
+# CELERY_RESULT_BACKEND = os.getenv('REDIS_CREDENTIALS', 'redis://redis:6379/0')
+# CELERY_RESULT_BACKEND = os.environ.get('REDIS_CREDENTIALS', 'redis://redis:6379/0')
+CELERY_RESULT_BACKEND = 'redis://:ysWL7SiwYi6ESJHfia0y2ePyu89lBiEx@redis-12793.c293.eu-central-1-1.ec2.cloud.redislabs.com:12793/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_TIME_LIMIT = 10
+
+# if DEBUG:
+#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

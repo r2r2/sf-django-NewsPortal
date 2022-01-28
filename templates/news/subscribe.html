@@ -4,22 +4,25 @@
     <hr>
 
 
+<div style="margin-left: 30%">
 <form action="" method="post" class="form-input">
     {% csrf_token %}
     <h3><label for="category_name">Выберите интересующие категории:<br></label></h3>
     {% for category in categories %}
         {% if category in cat_sub %}
-            <h6><label for="category_name">
+            <h5><label for="category_name">
                 <input type="checkbox" value="{{ category.category_name }}" name="category_name" checked>
-            </label> {{ category.category_name }}</h6>
+            </label> {{ category.category_name }}</h5>
         {% else %}
-            <h6><label for="category_name">
+            <h5><label for="category_name">
                 <input type="checkbox" value="{{ category.category_name }}" name="category_name">
-            </label> {{ category.category_name }}</h6>
+            </label> {{ category.category_name }}</h5>
         {% endif %}
     {% endfor %}
     <p class="small text-muted">Каждую неделю мы будем присылать Вам подборку статей из выбранных категорий.</p>
-    <input type="submit" value="Сохранить" class="btn btn-outline-info">
+    <p class="placeholder-wave"><span><input type="submit" value="Сохранить" class="btn btn-outline-info"></span></p>
 </form>
+</div>
+
 {% endblock content %}
 
