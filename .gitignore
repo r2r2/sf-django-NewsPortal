@@ -5,3 +5,4 @@ venv
 __pycache__/
 local_settings.py
 .idea
+cache_files

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db import models
 from django.db.models import Sum
 
@@ -46,6 +47,7 @@ class UserCategorySub(models.Model):
     def __str__(self):
         return f"{self.user} = {self.category}"
 
+
 class Post(models.Model):
     ARTICLE = 'AR'
     NEWS = 'NW'
@@ -62,6 +64,11 @@ class Post(models.Model):
     post_title = models.CharField(max_length=128, null=True, verbose_name='Заголовок')
     post_text = models.TextField(verbose_name='Текст статьи')
     post_rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+
+    # Переопределяем save для кэширования
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(self.pk)
 
     def get_absolute_url(self):
         return f'/news/{self.id}'

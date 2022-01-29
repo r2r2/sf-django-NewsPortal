@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
+from django.core.cache import cache
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
@@ -36,6 +37,17 @@ class NewsDetail(DetailView):
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
+    def get_object(self, *args, **kwargs):
+        # obj = cache.get(self.kwargs["pk"])  # If the object doesn’t exist in the cache, cache.get() returns None
+        #
+        # if not obj:
+        #     obj = super().get_object(*args, **kwargs)
+        #     cache.set(self.kwargs["pk"], obj)
+
+        obj = super().get_object(*args, **kwargs)
+        cache.get_or_set(self.kwargs["pk"], obj)
+
+        return obj
 
 class NewsSearch(LoginRequiredMixin, ListView):
     model = Post
