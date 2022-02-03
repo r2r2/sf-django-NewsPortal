@@ -36,6 +36,7 @@ class NewsDetail(DetailView):
     model = Post
     template_name = 'news/detail_news.html'
     context_object_name = 'detail_news'
+    slug_field = 'url'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -43,16 +44,11 @@ class NewsDetail(DetailView):
         return context
 
     def get_object(self, *args, **kwargs):
-        # obj = cache.get(self.kwargs["pk"])  # If the object doesn’t exist in the cache, cache.get() returns None
-        #
-        # if not obj:
-        #     obj = super().get_object(*args, **kwargs)
-        #     cache.set(self.kwargs["pk"], obj)
-
+        """Берем из кеша"""
         obj = super().get_object(*args, **kwargs)
-        cache.get_or_set(self.kwargs["pk"], obj)
+        cache_obj = cache.get_or_set(self.kwargs["slug"], obj)
+        return cache_obj
 
-        return obj
 
 class NewsSearch(LoginRequiredMixin, ListView):
     model = Post
@@ -74,13 +70,14 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     template_name = 'news/create_news.html'
     form_class = PostForm
     permission_required = ('news.add_post',)
+    slug_field = 'url'
 
     def form_valid(self, form):
         post = form.save()
         post.save()
         # notify_subscribers.apply_async([post.pk], countdown=5)  # После создания отправляем подписчикам письмо через Celery
         notify_subscribers.delay(post.pk)  # После создания отправляем подписчикам письмо через Celery
-        return redirect(f'/news/{post.pk}')
+        return redirect(f'/news/{post.url}')
 
 
 class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
@@ -89,8 +86,8 @@ class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = ('news.change_post',)
 
     def get_object(self, queryset=None):
-        id = self.kwargs.get('pk')
-        return Post.objects.get(pk=id)
+        slug = self.kwargs.get('slug')
+        return Post.objects.get(url=slug)
 
 
 class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -98,6 +95,7 @@ class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     queryset = Post.objects.all()
     success_url = '/news/'
     permission_required = ('news.delete_post',)
+    slug_field = 'url'
 
 
 class SubscribeView(View):

@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,38 +17,55 @@
 </head>
 <body>
 {% load cache %}
-    {% cache 60 * 15 navbar request.user.is_authenticated %}
-        <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container" style="width: 55%">
-                <a class="navbar-brand" href="/news">News Portal</a>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        {% if user.is_authenticated %}
-                            {% if is_not_author %}
-                                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:upgrade' %}">Стать автором</a></li>
-                            {% else %}
-                                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:create' %}">Добавить статью</a></li>
-                            {% endif %}
-                        {% endif %}
 
-                            <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:search' %}">Поиск</a></li>
-
-                        {% if user.is_authenticated %}
-                            <li class="nav-item"><a class="nav-link" aria-current="page" href="/accounts/logout/">Выйти</a></li>
-                            <li class="nav-item"><a class="nav-link" aria-current="page" style="text-decoration: none">| {{ user.username }}</a></li>
-
-                        {% else %}
-                            <li class="nav-item"><a class="nav-link" aria-current="page" href="/accounts/login/">Войти</a></li>
-                        {% endif %}
-
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    {% endcache %}
+<nav class="navbar navbar-expand-lg navbar-light">
     <div class="container" style="width: 55%">
-            {% block content %}
-            {% endblock content %}
+        <a class="navbar-brand" href="/news">News Portal</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                    {% if is_not_author %}
+                        <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:upgrade' %}">{% trans 'Стать автором' %}</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:create' %}">{% trans 'Добавить статью' %}</a></li>
+                    {% endif %}
+                {% endif %}
+
+                <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'news:search' %}">{% trans 'Поиск' %}</a></li>
+
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" aria-current="page" href="/accounts/logout/">{% trans 'Выйти' %}</a></li>
+                    <li class="nav-item"><a class="nav-link" aria-current="page" style="text-decoration: none">| {{ user.username }}</a></li>
+
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" aria-current="page" href="/accounts/login/">{% trans 'Войти' %}</a></li>
+                {% endif %}
+            </ul>
+
+            <form action="{% url 'set_language' %}" method="post" style='font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Light", wf_segoe-ui_light, Arial, "Helvetica Neue", Verdana, Helvetica, sans-serif;'>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ redirect_to }}">
+
+                <select name="language" id="">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    {% get_language_info_list for LANGUAGES as languages %}
+
+                    {% for language in languages %}
+                        <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %} selected {% endif %}>
+                            {{ language.code }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="set" class="btn btn-outline-secondary btn-sm">
+            </form>
+        </div>
     </div>
+</nav>
+
+<div class="container" style="width: 55%">
+    {% block content %}
+    {% endblock content %}
+</div>
 </body>
 </html>

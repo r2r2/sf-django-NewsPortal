@@ -1,0 +1,48 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-02 12:03+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+
+#: .\templates\main.html:29
+msgid "Стать автором"
+msgstr "Become an author"
+
+#: .\templates\main.html:31
+msgid "Добавить статью"
+msgstr "Add post"
+
+#: .\templates\main.html:35
+msgid "Поиск"
+msgstr "Search"
+
+#: .\templates\main.html:38
+msgid "Выйти"
+msgstr "Exit"
+
+#: .\templates\main.html:42
+msgid "Войти"
+msgstr "Sign In"
+
+#: .\templates\news\news.html:9 .\templates\news\search.html:8
+msgid "Последние публикации"
+msgstr "Last posts"
+
+#: .\templates\news\search.html:16
+msgid "Подписаться на рассылку"
+msgstr "Subscribe"
+

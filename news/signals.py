@@ -1,11 +1,13 @@
 from django.core.mail import EmailMultiAlternatives
-from django.db.models.signals import m2m_changed
+from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 
+
 from NewsPortal.settings import DEFAULT_FROM_EMAIL
 from news.models import Post, Category
+from pytils.translit import slugify
 
 
 # @receiver(m2m_changed, sender=Post.category.through)
@@ -39,3 +41,10 @@ def sendNewPost(category_id, instance_id):
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     return redirect('news:news')
+
+
+# @receiver(pre_save, sender=Post)
+# def populate_slug(sender, instance, *args, **kwargs):
+#     """Генерируем slug для поста"""
+#     if not instance.url:
+#         instance.url = slugify(instance.post_title)
