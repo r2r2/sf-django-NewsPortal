@@ -4,14 +4,21 @@
 {% block title %}
     {{ detail_news.post_title|censor }}
 {% endblock title %}
-{% block css %}{% endblock css %}
 
 {% block content %}
-    <h2>{{ detail_news.post_title|censor }}</h2>
+    <h2>{{ detail_news.post_title|censor|safe }}</h2>
     <div class="small text-muted"><p>{{ detail_news.date_creation|date:'d M Y' }}</p></div>
     <hr>
-    <p>{{ detail_news.post_text|linebreaks|censor|safe }}</p>
-
+    <table>
+        <tr>
+            <td>
+                {% if detail_news.image %}
+                    <img src="{{ detail_news.image.url }}" alt="img" class="fig">
+                {% endif %}
+                {{ detail_news.post_text|linebreaks|censor|safe }}
+            </td>
+        </tr>
+    </table>
     <p><a href="{% url 'news:update' detail_news.url %}"><u>Редактировать</u></a></p>
     <p><a href="{% url 'news:delete' detail_news.url %}"><u>Удалить</u></a></p>
 

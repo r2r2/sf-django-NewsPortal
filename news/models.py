@@ -76,7 +76,7 @@ class Post(models.Model):
     post_text = models.TextField(verbose_name='Текст статьи')
     post_rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     image = models.ImageField('Картинка', upload_to='news/%Y/%m/%d', null=True, blank=True)
-    url = models.SlugField(max_length=255, unique=True, db_index=True)
+    url = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
 
     class Meta:
         verbose_name = 'Статья'

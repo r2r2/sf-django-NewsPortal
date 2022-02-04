@@ -1,25 +1,31 @@
 {% extends 'main.html' %}
 {% load my_filters %}
 {% load i18n %}
+{% load static %}
 
 {% block title %} News {% endblock title %}
 
-
 {% block content %}
-    <h2>{% translate "Последние публикации" %}</h2>
-
-
+    <h2>{% trans "Последние публикации" %}</h2>
     <hr>
-
     {% for new in news %}
-        <h5><a href="{% url 'news:news_detail' new.url %}"><strong>{{ new.post_title|censor }}</strong></a></h5>
+        <h5><a href="{% url 'news:news_detail' new.url %}"><strong>{{ new.post_title|censor|safe }}</strong></a></h5>
         <div class="small text-muted"><p>{{ new.date_creation|date:'d M Y' }}</div>
-        {{ new.post_text|truncatechars:250|censor }}<br><br></p>
-
+        <table>
+            <tr>
+                {% if new.image %}
+                    <td class="leftcol">
+                        <img src="{{ new.image.url }}" alt="img" class="fig">
+                    </td>
+                {% endif %}
+                <td class="rightcol">
+                    {{ new.post_text|truncatechars:450|censor|safe }}<br><br>
+                </td>
+            </tr>
+        </table>
     {% empty %}
         <li>Sorry, no news found in this category.</li>
     {% endfor %}
-
 
     <nav aria-label="Page navigation">
         <ul class="pagination pagination-sm justify-content-center">
@@ -52,3 +58,4 @@
     </nav>
 
 {% endblock content %}
+

@@ -1,17 +1,13 @@
 from django.contrib import admin
 from modeltranslation.admin import TranslationAdmin
 
-from news.models import Author, Category, Post, Comment, UserCategorySub
+from .forms import PostAdminForm
+from .models import Author, Category, Post, Comment, UserCategorySub
 
 
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ('author_name', 'author_rating')
-
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    pass
 
 
 @admin.register(UserCategorySub)
@@ -28,10 +24,12 @@ class PostAdmin(TranslationAdmin):
     list_display = ('author', 'post_title', 'post_text', 'post_rating', 'date_creation')
     list_filter = ('author', 'post_rating', 'date_creation')
     search_fields = ('post_title', 'category__category_name')
+    save_on_top = True
     prepopulated_fields = {"url": ("post_title",)}
+    form = PostAdminForm
     fieldsets = (
         (None, {
-            'fields': ('author', 'url', 'post_title', 'image', 'post_text', 'post_rating', 'date_creation')
+            'fields': ('author', 'post_title', 'url', 'image', 'post_text', 'post_rating', 'date_creation')
         }),
     )
 
@@ -41,3 +39,8 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('user', 'text', 'date_creation')
     search_fields = ('user', 'post')
     list_filter = ('user', 'date_creation')
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    pass

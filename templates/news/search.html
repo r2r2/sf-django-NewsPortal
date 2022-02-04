@@ -17,12 +17,22 @@
 
 
     {% for new in filter.qs %}
-        <h5><a href="{% url 'news:news_detail' new.url %}"><strong>{{ new.post_title|censor }}</strong></a></h5>
-        <p><div class="small text-muted">{{ new.date_creation|date:'d M Y' }}</div><br>
-        {{ new.post_text|truncatechars:250|censor }}<br><br></p>
+        <h5><a href="{% url 'news:news_detail' new.url %}"><strong>{{ new.post_title|censor|safe }}</strong></a></h5>
+        <div class="small text-muted"><p>{{ new.date_creation|date:'d M Y' }}</div>
+        <table>
+            <tr>
+                {% if new.image %}
+                    <td class="leftcol">
+                        <img src="{{ new.image.url }}" alt="img" class="fig">
+                    </td>
+                {% endif %}
+                <td class="rightcol">
+                    {{ new.post_text|truncatechars:450|censor|safe }}<br><br>
+                </td>
+            </tr>
+        </table>
     {% empty %}
-        <p>Sorry, no news found in this category.</p>
-
+        <li>Sorry, no news found in this category.</li>
     {% endfor %}
 
     <nav aria-label="Page navigation">

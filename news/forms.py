@@ -1,18 +1,17 @@
 from allauth.account.forms import SignupForm
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django.contrib.auth.models import Group
-from django.forms import ModelForm, Textarea, ModelMultipleChoiceField, TextInput, ChoiceField
+from django.forms import ModelForm, Textarea, ModelMultipleChoiceField, TextInput
 from django import forms
 from .models import Post, Category
 
 
 class PostForm(ModelForm):
     """Форма добавления статьи на сайт"""
-
     category = ModelMultipleChoiceField(queryset=Category.objects.all(), label='Категория', to_field_name='category_name')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.fields['category'].empty_label = "Категория не выбрана"
         self.fields['author'].empty_label = "Автор не выбран"
 
     class Meta:
@@ -21,8 +20,17 @@ class PostForm(ModelForm):
         widgets = {
             'post_title': TextInput(attrs={'class': 'form-input'}),
             'post_text': Textarea(attrs={'cols': 60, 'rows': 10, 'class': 'form-input'}),
-            # 'category': ChoiceField(attrs={'class': 'form-input'})
         }
+
+
+class PostAdminForm(forms.ModelForm):
+    """Форма добавления статьи в админке"""
+    post_text_ru = forms.CharField(label='Текст[RU]', widget=CKEditorUploadingWidget())
+    post_text_en = forms.CharField(label='Текст[EN]', widget=CKEditorUploadingWidget())
+
+    class Meta:
+        model = Post
+        fields = '__all__'
 
 
 class CommonSignupForm(SignupForm):
