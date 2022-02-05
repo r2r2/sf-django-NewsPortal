@@ -109,6 +109,9 @@ class Post(models.Model):
                f"{self.post_title}\n" \
                f"{self.preview()}\n"
 
+    def get_comment(self):
+        return self.comment_set.filter(parent__isnull=True)
+
 
 class PostCategory(models.Model):
     """M2M table"""
@@ -119,9 +122,13 @@ class PostCategory(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField(max_length=255)
+    text = models.TextField(max_length=555)
     date_creation = models.DateTimeField(auto_now_add=True)
     comment_rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    email = models.EmailField(verbose_name='Email', blank=True, null=True)
+    parent = models.ForeignKey(
+        'self', verbose_name='Родитель', on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     class Meta:
         verbose_name = 'Комментарий'

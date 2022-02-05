@@ -16,5 +16,6 @@ urlpatterns = [
     path('add/', NewsCreate.as_view(), name='create'),
     path('upgrade/', upgrade_to_author, name='upgrade'),
     path('subscribe/', SubscribeView.as_view(), name='subscribe'),
+    path('comment/<int:pk>/', AddComment.as_view(), name='add_comment')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

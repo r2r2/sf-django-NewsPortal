@@ -9,75 +9,91 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .tasks import *
+from .tasks import notify_subscribers, sendNewPost, send_mail_to_subs
 from NewsPortal.settings import DEFAULT_FROM_EMAIL
 from .filters import PostFilter
-from .forms import PostForm
-from .models import Post, UserCategorySub, Category
+from .forms import PostForm, CommentForm
+from .models import Post, UserCategorySub, Category, Author
 
 
 logger = logging.getLogger(__name__)
 
 
-class NewsList(ListView):
+class IsNotAuthor:
+    """Проверяем является ли пользователь автором"""
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        return context
+
+
+class NewsList(IsNotAuthor, ListView):
     model = Post
     template_name = 'news/news.html'
     context_object_name = 'news'
     ordering = ['-id']
     paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super(NewsList, self).get_context_data(**kwargs)
-        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super(NewsList, self).get_context_data(**kwargs)
+    #     context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+    #     return context
 
 
-class NewsDetail(DetailView):
+class NewsDetail(IsNotAuthor, DetailView):
     model = Post
     template_name = 'news/detail_news.html'
     context_object_name = 'detail_news'
     slug_field = 'url'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+    #     return context
 
     def get_object(self, *args, **kwargs):
-        """Берем из кеша"""
+        """Берем из кэша"""
         obj = super().get_object(*args, **kwargs)
         cache_obj = cache.get_or_set(self.kwargs["slug"], obj)
         return cache_obj
 
 
-class NewsSearch(LoginRequiredMixin, ListView):
+class NewsSearch(LoginRequiredMixin, IsNotAuthor, ListView):
+    """Страница поиска с фильтрами"""
     model = Post
     template_name = 'news/search.html'
     context_object_name = 'news'
     ordering = ['-id']
     paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super(NewsSearch, self).get_context_data(**kwargs)
-        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
-        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
-        # context['category'] = self.request.GET.get('category', 0)
-        # context['is_sub'] = Category.objects.filter(subscribers=self.request.user.id)
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super(NewsSearch, self).get_context_data(**kwargs)
+    #     context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
+    #     context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+    #     # context['category'] = self.request.GET.get('category', 0)
+    #     # context['is_sub'] = Category.objects.filter(subscribers=self.request.user.id)
+    #     return context
 
 
 class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    """Добавить статью"""
     template_name = 'news/create_news.html'
     form_class = PostForm
     permission_required = ('news.add_post',)
     slug_field = 'url'
 
     def form_valid(self, form):
-        post = form.save()
+        post = form.save(commit=False)
+        try:
+            author = Author.objects.get(author_name=self.request.user)
+        except Author.DoesNotExist:
+            author = Author.objects.create(author_name=self.request.user)
+        post.author = author
         post.save()
         # notify_subscribers.apply_async([post.pk], countdown=5)  # После создания отправляем подписчикам письмо через Celery
         notify_subscribers.delay(post.pk)  # После создания отправляем подписчикам письмо через Celery
-        return redirect(f'/news/{post.url}')
+        return redirect(post.get_absolute_url())
 
 
 class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
@@ -141,7 +157,20 @@ def upgrade_to_author(request):
     return redirect('news:news')
 
 
-
+class AddComment(View):
+    """Комментарий"""
+    def post(self, request, pk):
+        form = CommentForm(request.POST)
+        post = Post.objects.get(id=pk)
+        user = request.user
+        if form.is_valid():
+            form = form.save(commit=False)
+            if request.POST.get('parent', None):
+                form.parent_id = int(request.POST.get('parent'))
+            form.post = post
+            form.user = user
+            form.save()
+        return redirect(post.get_absolute_url())
 
 
 

@@ -544,6 +544,21 @@ IMG.fig {
   width: 250px;
   height: auto;
 }
+
+IMG.img-detail {
+  float: left;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+IMG.img-fluid {
+  float: left;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  width: 85px;
+  height: auto;
+}
+
 TD.leftcol {
   width: 250px;
   vertical-align: top;

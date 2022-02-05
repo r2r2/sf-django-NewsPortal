@@ -1,5 +1,4 @@
 {% extends 'main.html' %}
-{% load crispy_forms_tags %}
 
 {% block title %} News Create {% endblock title %}
 
@@ -7,9 +6,9 @@
     <h2>Добавить статью</h2>
     <hr>
     <div style="margin-left: 30%">
-    <form method="post" class="form-input">
+    <form method="post" class="form-input" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form|crispy }}
+        {{ form.as_p }}
         <br>
         <input type="submit" value="Добавить" class="btn btn-success btn-sm">
     </form>
