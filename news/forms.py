@@ -3,7 +3,9 @@ from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django.contrib.auth.models import Group
 from django.forms import ModelForm, Textarea, ModelMultipleChoiceField, TextInput, CheckboxSelectMultiple, ImageField
 from django import forms
-from .models import Post, Category, Comment
+from snowpenguin.django.recaptcha3.fields import ReCaptchaField
+
+from .models import Post, Category, Comment, Rating, RatingStar
 
 
 class PostForm(ModelForm):
@@ -16,7 +18,7 @@ class PostForm(ModelForm):
 
     class Meta:
         model = Post
-        fields = ['post_title', 'post_text', 'category', 'image']  # , 'author'
+        fields = ['post_title', 'post_text', 'category', 'image']
         widgets = {
             'post_title': TextInput(attrs={'class': 'form-input'}),
             'post_text': Textarea(attrs={'cols': 60, 'rows': 10, 'class': 'form-input'}),
@@ -45,10 +47,23 @@ class CommonSignupForm(SignupForm):
 
 class CommentForm(forms.ModelForm):
     """Форма комментариев"""
+    captcha = ReCaptchaField()
+
     class Meta:
         model = Comment
-        fields = ["text", ]
+        fields = ["text", 'captcha']
+        widgets = {
+            'text': forms.Textarea(attrs={'class': 'form-control border'}),
+        }
 
+
+class RatingForm(forms.ModelForm):
+    """Форма добавления рейтинга"""
+    star = forms.ModelChoiceField(queryset=RatingStar.objects.all(), widget=forms.RadioSelect(), empty_label=None)
+
+    class Meta:
+        model = Rating
+        fields = ('star',)
 
 
 # Если регистрируется через Гугл # TODO make self adding to "common" group through Google

@@ -9,6 +9,7 @@ app_name = 'news'
 
 urlpatterns = [
     path('', NewsList.as_view(), name='news'),
+    path('add-rating/', AddStarRating.as_view(), name='add_rating'),
     path('<slug:slug>', NewsDetail.as_view(), name='news_detail'),
     path('<slug:slug>/edit', NewsUpdate.as_view(), name='update'),
     path('<slug:slug>/delete', NewsDelete.as_view(), name='delete'),

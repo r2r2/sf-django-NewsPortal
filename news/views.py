@@ -1,10 +1,10 @@
 import logging
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.core.mail import send_mail, EmailMultiAlternatives
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.views import View
@@ -12,45 +12,51 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .tasks import notify_subscribers, sendNewPost, send_mail_to_subs
 from NewsPortal.settings import DEFAULT_FROM_EMAIL
 from .filters import PostFilter
-from .forms import PostForm, CommentForm
-from .models import Post, UserCategorySub, Category, Author
-
+from .forms import PostForm, CommentForm, RatingForm
+from .models import Post, UserCategorySub, Category, Author, Rating, RatingStar
 
 logger = logging.getLogger(__name__)
 
 
-class IsNotAuthor:
-    """Проверяем является ли пользователь автором"""
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
-        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
-        return context
+# class IsNotAuthor:
+#     """Проверяем является ли пользователь автором"""
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
+#         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+#         context['star_form'] = RatingForm()
+#         return context
 
 
-class NewsList(IsNotAuthor, ListView):
+class NewsList(ListView):
     model = Post
     template_name = 'news/news.html'
     context_object_name = 'news'
     ordering = ['-id']
     paginate_by = 10
 
-    # def get_context_data(self, **kwargs):
-    #     context = super(NewsList, self).get_context_data(**kwargs)
-    #     context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
-    #     return context
+    def get_context_data(self, **kwargs):
+        context = super(NewsList, self).get_context_data(**kwargs)
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        return context
 
 
-class NewsDetail(IsNotAuthor, DetailView):
+class NewsDetail(DetailView):
     model = Post
     template_name = 'news/detail_news.html'
     context_object_name = 'detail_news'
     slug_field = 'url'
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
-    #     return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        context['star_form'] = RatingForm()
+        context['set_rating'] = Rating.objects.filter(ip=self.request.META.get('REMOTE_ADDR')).exists()
+        context['rating'] = Rating.objects.filter(ip=self.request.META.get('REMOTE_ADDR', None))
+        if self.request.user.is_authenticated:
+            context['author'] = Author.objects.filter(author_name=self.request.user).filter(post__url=self.kwargs['slug'])
+        context['form'] = CommentForm()
+        return context
 
     def get_object(self, *args, **kwargs):
         """Берем из кэша"""
@@ -59,7 +65,7 @@ class NewsDetail(IsNotAuthor, DetailView):
         return cache_obj
 
 
-class NewsSearch(LoginRequiredMixin, IsNotAuthor, ListView):
+class NewsSearch(LoginRequiredMixin, ListView):
     """Страница поиска с фильтрами"""
     model = Post
     template_name = 'news/search.html'
@@ -67,13 +73,11 @@ class NewsSearch(LoginRequiredMixin, IsNotAuthor, ListView):
     ordering = ['-id']
     paginate_by = 10
 
-    # def get_context_data(self, **kwargs):
-    #     context = super(NewsSearch, self).get_context_data(**kwargs)
-    #     context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
-    #     context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
-    #     # context['category'] = self.request.GET.get('category', 0)
-    #     # context['is_sub'] = Category.objects.filter(subscribers=self.request.user.id)
-    #     return context
+    def get_context_data(self, **kwargs):
+        context = super(NewsSearch, self).get_context_data(**kwargs)
+        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        return context
 
 
 class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -173,8 +177,27 @@ class AddComment(View):
         return redirect(post.get_absolute_url())
 
 
+class AddStarRating(View):
+    """Добавление рейтинга статье"""
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
 
-
+    def post(self, request):
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            Rating.objects.update_or_create(
+                ip=self.get_client_ip(request),
+                post_id=int(request.POST.get("post")),
+                defaults={'star_id': int(request.POST.get("star"))}
+            )
+            return HttpResponse(status=201)
+        else:
+            return HttpResponse(status=400)
 
 
 

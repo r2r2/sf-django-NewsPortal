@@ -27,42 +27,14 @@
                     </td>
                 {% endif %}
                 <td class="rightcol">
-                    {{ new.post_text|truncatechars:450|censor|safe }}<br><br>
+                    {{ new.post_text|truncatechars:450|censor }}<br><br>
                 </td>
             </tr>
         </table>
     {% empty %}
-        <li>Sorry, no news found in this category.</li>
+        <h5>По Вашему запросу статьи не найдены.</h5>
     {% endfor %}
 
-    <nav aria-label="Page navigation">
-        <ul class="pagination pagination-sm justify-content-center">
-            <!-- Проверяем что поддерживается постраничный вывод -->
-            {% if is_paginated %}
-
-                <!-- Если доступна предыдущая страница, то даём ссылку на неё и самую первую страницу -->
-                {% if page_obj.has_previous %}
-                    <li class="page-item"><a href="?page=1" class="page-link">First</a></li>
-                    <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link">&laquo;</a></li>
-                {% endif %}
-
-                <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <li class="page-item active" aria-current="page"><a class="page-link">{{ num }}</a></li>
-                    {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
-                        <li class="page-item"><a href="?page={{ num }}" class="page-link">{{ num }}</a></li>
-                    {% endif %}
-                {% endfor %}
-
-                <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
-                {% if page_obj.has_next %}
-                    <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">&raquo;</a></li>
-                    <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages}}" class="page-link">Last</a></li>
-                {% endif %}
-
-            {% endif %}
-        </ul>
-    </nav>
+   {% include 'include/pagination.html' %}
 
 {% endblock content %}

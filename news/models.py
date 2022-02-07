@@ -74,7 +74,8 @@ class Post(models.Model):
     category = models.ManyToManyField(Category, through='PostCategory', verbose_name='Категория')
     post_title = models.CharField(max_length=128, null=True, verbose_name='Заголовок')
     post_text = models.TextField(verbose_name='Текст статьи')
-    post_rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    # post_rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    post_rating = models.SmallIntegerField("Рейтинг", default=0)
     image = models.ImageField('Картинка', upload_to='news/%Y/%m/%d', null=True, blank=True)
     url = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
 
@@ -111,6 +112,33 @@ class Post(models.Model):
 
     def get_comment(self):
         return self.comment_set.filter(parent__isnull=True)
+
+
+class RatingStar(models.Model):
+    """Звезды рейтинга"""
+    value = models.SmallIntegerField('Значение', default=0)
+
+    def __str__(self):
+        return f'{self.value}'
+
+    class Meta:
+        verbose_name = 'Звезда рейтинга'
+        verbose_name_plural = 'Звезды рейтинга'
+        ordering = ['-value']
+
+
+class Rating(models.Model):
+    """Рейтинг"""
+    ip = models.CharField('IP адрес', max_length=15)
+    star = models.ForeignKey(RatingStar, on_delete=models.CASCADE, verbose_name='Звезда')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name='Статья')
+
+    def __str__(self):
+        return f'{self.star} - {self.post}'
+
+    class Meta:
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
 
 
 class PostCategory(models.Model):

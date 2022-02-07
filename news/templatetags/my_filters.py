@@ -23,4 +23,6 @@ def censor(value: str):
         return value
 
 
-
+@register.filter(name='range')
+def times(number):
+    return range(number)

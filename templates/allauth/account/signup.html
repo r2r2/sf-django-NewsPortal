@@ -1,5 +1,5 @@
 {% extends "main.html" %}
-
+{% load crispy_forms_filters %}
 {% load i18n %}
 
 {% block head_title %}{% trans "Signup" %}{% endblock %}
@@ -7,15 +7,17 @@
 {% block content %}
 <h1>{% trans "Sign Up" %}</h1>
 
+    <div class="mb-3" style="margin-left: 30%">
 <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">Sign In</a>.{% endblocktrans %}</p>
 
 <form class="form-input" id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}
-  {{ form.as_p }}
+  {{ form|crispy }}
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
+    <br>
   <button type="submit" class="btn btn-outline-success btn-sm">{% trans "Sign Up" %} &raquo;</button>
 </form>
-
+</div>
 {% endblock %}

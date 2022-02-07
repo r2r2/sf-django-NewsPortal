@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 from modeltranslation.admin import TranslationAdmin
 
 from .forms import PostAdminForm
-from .models import Author, Category, Post, Comment, UserCategorySub, PostCategory
+from .models import Author, Category, Post, Comment, UserCategorySub, PostCategory, Rating, RatingStar
 
 
 @admin.register(Author)
@@ -70,10 +70,18 @@ class CommentAdmin(admin.ModelAdmin):
     readonly_fields = ('email', )
 
 
+@admin.register(Rating)
+class RatingAdmin(admin.ModelAdmin):
+    """Рейтинг"""
+    list_display = ("star", "post", "ip")
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     pass
 
+
+admin.site.register(RatingStar)
 
 admin.site.site_title = 'News Portal'
 admin.site.site_header = 'News Portal'

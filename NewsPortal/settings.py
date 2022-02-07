@@ -45,14 +45,18 @@ INSTALLED_APPS = [
     'django_filters',
     'crispy_forms',
     'django_apscheduler',
+
     'ckeditor',
     'ckeditor_uploader',
+
+    'snowpenguin.django.recaptcha3',
 
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     # ... include the providers you want to enable:
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.vk',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -393,6 +397,11 @@ CKEDITOR_CONFIGS = {
         ]),
     }
 }
+
+RECAPTCHA_PUBLIC_KEY = '6Lf5O18eAAAAAEAyaPO5eJKiLc5nOaVV_tYputH7'
+RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
+RECAPTCHA_DEFAULT_ACTION = 'generic'
+RECAPTCHA_SCORE_THRESHOLD = 0.5
 
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
